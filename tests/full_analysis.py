@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 """Comparing Direct Fit and FGEE Fit."""
 
-#########################################################################
+########################################################################################
 # Import Packages
-#########################################################################
+########################################################################################
 
-from plotting_tools import (
+from helper_function.plotting_tools import (
     algebraic_plot_ellipse,
-    plot_circle,
     lissajous_plot,
-    current_plot_FP,
     signals_post_filter,
 )
 from ellipse_fitting.cov_geo_param import cov_geo_params
@@ -35,9 +33,9 @@ import pandas as pd
 import re
 from time import time
 
-#########################################################################
+########################################################################################
 # Constants and Parameters
-#########################################################################
+########################################################################################
 
 # Plotting Resolution
 
@@ -47,9 +45,9 @@ mpl.rcParams["figure.dpi"] = 300
 
 path = "data/large_proportion_of_ellipse.csv"
 
-#########################################################################
+########################################################################################
 # Define Helper Functions
-#########################################################################
+########################################################################################
 
 
 def read_file_details(file, n, row):
@@ -95,7 +93,7 @@ def import_data(path):
     return data
 
 
-def filter_data(data, l1, l3, l4, lim0, lim1, resample=True):
+def filter_data(data, l1, l3, l4, lim0, lim1, resample=1000):
     time = data["time"]
     CH3_V = data["CH3"]
     CH4_V = data["CH4"]
@@ -119,19 +117,7 @@ def filter_data(data, l1, l3, l4, lim0, lim1, resample=True):
 
     _, CH1_V_f = ch1filt.signal()
 
-    if resample is True:
-        CH3_V_ellipse, CH4_V_ellipse = twod_hist(CH3_V_f, CH4_V_f, 1000)
-
-    else:
-        ch3filt.truncate(lim0, lim1)
-        ch4filt.truncate(lim0, lim1)
-
-        # ch4filt.cubic_resample(5000)
-        # ch3filt.cubic_resample(5000)
-
-        _, CH3_V_ellipse = ch3filt.signal()
-
-        _, CH4_V_ellipse = ch4filt.signal()
+    CH3_V_ellipse, CH4_V_ellipse = twod_hist(CH3_V_f, CH4_V_f, resample)
 
     data["CH1f"] = CH1_V_f
     data["CH3f"] = CH3_V_f
@@ -235,3 +221,6 @@ x_p, y_p = plot_ellipse(
 )
 
 ax3.plot(x_p, y_p)
+
+# Remapping
+
