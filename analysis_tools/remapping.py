@@ -18,14 +18,15 @@ def map_ellipse(alpha, beta, phi, cent, s_alpha, s_beta, s_phi, s_cent, x, y):
         phi (float): rotation angle [rad]
         cent (np.ndarray): centre vector of ellipse
         s_alpha (float): 1 standard deviation error of alpha
-        s_beta (float): 1 standard deviation error of beta
-        s_phi (float): 1 standard deviation error of phi [rad]
-        s_cent (np.ndarray): 1 standard deviation error of each centre vector
+        s_beta (float): 1 std error of beta
+        s_phi (float): 1 std error of phi [rad]
+        s_cent (np.ndarray): 1 std error of each centre vector
         x (np.ndarray): ellipse x-data
         y (np.ndarray): ellipse y-data
 
     Returns:
-        X (np.ndarray): remapped ellipse points to a unit circle
+        result (np.ndarray): remapped ellipse points to a unit circle
+        std (np.ndarray): 1 std error of each remapped ellipse points
 
     """
     X = np.array([x, y])
