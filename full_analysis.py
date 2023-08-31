@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Comparing Direct Fit and FGEE Fit."""
+"""An Example Analysis of FOCS Data."""
 
 ########################################################################################
 # Import Packages
