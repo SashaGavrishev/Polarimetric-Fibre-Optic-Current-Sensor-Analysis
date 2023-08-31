@@ -1,5 +1,5 @@
 imageio
-pywt
+PyWavelets
 numpy
 scipy
 re
