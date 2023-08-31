@@ -55,6 +55,29 @@ def lissajous_plot(x, y):
     return fig, ax, line
 
 
+def lissajous_plot_errors(x, y, sig_x, sig_y):
+    """Generate a Lissajous Plot with errors.
+
+    Args:
+        x (np.ndarray): x data
+        y (np.ndarray): y data
+
+    Returns:
+        fig (matplotlib.figure.Figure): matplotlib figure object
+        ax (matplotlib.axes._subplots.AxesSubplot): matplotlib axes object
+
+    """
+    fig, ax = plt.subplots()
+    line = ax.errorbar(x, y, xerr=sig_x, yerr=sig_y, fmt=".", capsize=2, color="gray")[
+        0
+    ]
+    ax.set_box_aspect(1)
+    ax.set_title("Lissajous Figure")
+    ax.set_xlabel(r"Signal 1 [A.U.]")
+    ax.set_ylabel(r"Signal 2 [A.U.]")
+    return fig, ax, line
+
+
 def lissajous_plot_T(time, x, y):
     """Generate a Lissajous Plot with time.
 
@@ -128,6 +151,36 @@ def current_plot_FP(t_f, current_f, t_p, current_p):
     return fig, ax
 
 
+def current_plot_FP(t_f, current_f, sig_current_f, t_p, current_p):
+    """Generate current plot.
+
+    Args:
+        t_f (np.ndarray): time data for Faraday
+        current_f (np.ndarray): current data for Faraday
+        t_p (np.ndarray): time data for Pearson
+        current_p (np.ndarray): current data for Pearson
+
+    Returns:
+        fig (matplotlib.figure.Figure): matplotlib figure object
+        ax (matplotlib.axes._subplots.AxesSubplot): matplotlib axes object
+
+    """
+    fig, ax = plt.subplots()
+    ax.plot(t_p, current_p, "--", label="Pearson", color="black")
+    ax.plot(t_f, current_f, label="Faraday", color="royalblue")
+    ax.fill_between(
+        t_f,
+        current_f - sig_current_f,
+        current_f + sig_current_f,
+        color="royalblue",
+        alpha=0.5,
+    )
+    ax.set_xlabel(r"Time [$\mu$s]")
+    ax.set_ylabel(r"$I (t)$ [A]")
+    ax.legend()
+    return fig, ax
+
+
 def current_plot_just_F(t_f, current_f):
     """Generate current plot.
 
@@ -184,12 +237,8 @@ def generate_Lissajous_animation(time, x, y, title, samples):
         ax.grid()
         ax.set_box_aspect(1)
         fig.canvas.draw()
-        image = np.frombuffer(
-            fig.canvas.tostring_rgb(), dtype="uint8"
-        )
-        frames.append(
-            image.reshape(*reversed(fig.canvas.get_width_height()), 3)
-        )
+        image = np.frombuffer(fig.canvas.tostring_rgb(), dtype="uint8")
+        frames.append(image.reshape(*reversed(fig.canvas.get_width_height()), 3))
     imageio.mimsave(
         f"./animation_{title}.gif",  # output gif
         frames,  # array of input frames
@@ -221,12 +270,8 @@ def signals_post_filter(time, x, y, x_f, y_f):
 
     # fig.suptitle('Filtering Comparison')
 
-    ax[0].plot(
-        time, x - x.mean(), "-", label="Ch.3 raw", color="black"
-    )
-    ax[1].plot(
-        time, y - y.mean(), "-", label="Ch.4 raw", color="black"
-    )
+    ax[0].plot(time, x - x.mean(), "-", label="Ch.3 raw", color="black")
+    ax[1].plot(time, y - y.mean(), "-", label="Ch.4 raw", color="black")
 
     ax[0].plot(
         time,
