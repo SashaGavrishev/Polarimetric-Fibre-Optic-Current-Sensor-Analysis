@@ -5,7 +5,7 @@
 # Import Packages
 #########################################################################
 
-from plotting_tools import (
+from helper_function.plotting_tools import (
     algebraic_plot_ellipse,
     plot_circle,
     lissajous_plot,
