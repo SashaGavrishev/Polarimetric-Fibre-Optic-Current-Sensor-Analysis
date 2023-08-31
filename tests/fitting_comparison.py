@@ -245,3 +245,5 @@ x_p, y_p = plot_ellipse(
 )
 
 ax3.plot(x_p, y_p)
+
+plt.show()
