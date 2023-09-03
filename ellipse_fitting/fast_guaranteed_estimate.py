@@ -16,7 +16,7 @@ def fgee_estimate(x, y, theta_dir, covList=None):
 
     nPts = max(dPts.shape)
 
-    if covList == None:
+    if covList is None:
         covList = np.tile(np.eye(2), (1, nPts)).T.reshape(nPts, 2, 2)
 
     initialEllipseParameters = theta_dir

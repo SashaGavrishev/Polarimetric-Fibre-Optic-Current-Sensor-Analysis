@@ -24,10 +24,13 @@ def twod_hist(x_data, y_data, bins=50):
     x_c = np.convolve(xedges, np.ones(2) / 2, mode="valid")
     y_c = np.convolve(yedges, np.ones(2) / 2, mode="valid")
 
+    x_width = xedges[1] - xedges[0]
+    y_width = yedges[1] - xedges[0]
+
     Pts = np.vstack((x_c, y_c))
 
     argZ = np.argwhere(Z != 0).T
 
     x_c, y_c = Pts[[[0], [1]], argZ]
 
-    return x_c, y_c
+    return x_c, y_c, x_width, y_width

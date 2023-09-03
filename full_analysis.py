@@ -8,7 +8,6 @@
 from helper_function.plotting_tools import (
     algebraic_plot_ellipse,
     lissajous_plot,
-    lissajous_plot_errors,
     signals_post_filter,
     plot_circle,
     current_plot_FP,
@@ -18,9 +17,10 @@ from ellipse_fitting.fast_guaranteed_estimate import fgee_estimate
 from ellipse_fitting.cov_geo_param import cov_geo_params
 from ellipse_fitting.ellipse_tools import (
     ellipse_parameters,
-    plot_ellipse,
 )
+from ellipse_fitting.normalise_isotropically import normalise_isotropically
 from ellipse_fitting.direct_fit import direct_ellipse_fit
+from ellipse_fitting.self_norm_alg_fit import self_norm_alg_fit
 from analysis_tools.theta_extractor import theta_t
 from analysis_tools.remapping import map_ellipse
 from analysis_tools.filtering import filter_sig
@@ -47,7 +47,7 @@ mpl.rcParams["figure.dpi"] = 300
 
 # Data File Path
 
-path = "data/large_proportion_of_ellipse.csv"
+path = "data/large_proportion_of_ellipse_3.csv"
 
 ########################################################################################
 # Define Helper Functions
@@ -121,7 +121,8 @@ def filter_data(data, l1, l3, l4, resample=1000):
 
     _, CH1_V_f = ch1filt.signal()
 
-    CH3_V_ellipse, CH4_V_ellipse = twod_hist(CH3_V_f, CH4_V_f, resample)
+    CH3_V_ellipse, CH4_V_ellipse, _, _ = twod_hist(CH3_V_f, CH4_V_f, resample)
+
 
     data["CH1f"] = CH1_V_f
     data["CH3f"] = CH3_V_f
@@ -133,6 +134,17 @@ def filter_data(data, l1, l3, l4, resample=1000):
     return data
 
 
+def calc_residual_systematic_err(x_remap, y_remap):
+    vector = np.array([x_remap, y_remap]).T
+    length = np.linalg.norm(vector, axis=1)
+    residual_error = np.abs(length - 1)
+    sig_theta_systematic = np.arctan2(
+        np.sqrt(1 - (1 - (residual_error**2) / 2) ** 2),
+        (1 - (residual_error**2) / 2),
+    )
+    return sig_theta_systematic
+
+
 def multipage(filename, figs=None, dpi=100):
     pp = PdfPages(filename)
     if figs is None:
@@ -142,9 +154,9 @@ def multipage(filename, figs=None, dpi=100):
     pp.close()
 
 
-#########################################################################
+#####################################################################################
 # Main Code
-#########################################################################
+#####################################################################################
 
 # Import Data
 
@@ -184,7 +196,7 @@ fig3, ax3, line3_1 = lissajous_plot(data["CH3e"], data["CH4e"])
 ax3.set_title("")
 
 line3_2 = algebraic_plot_ellipse(theta_dir, ax3)
-line3_3 = algebraic_plot_ellipse(theta_fgee, ax3)
+line3_4 = algebraic_plot_ellipse(theta_fgee, ax3)
 
 line3_1.set_marker("x")
 line3_1.set_linestyle("")
@@ -193,8 +205,9 @@ line3_1.set_label("filtered data")
 line3_2.set_label("direct fit")
 line3_2.set_color("royalblue")
 
-line3_3.set_label("fgee fit")
-line3_3.set_color("darkred")
+
+line3_4.set_label("fgee fit")
+line3_4.set_color("darkred")
 
 ax3.legend()
 
@@ -247,13 +260,17 @@ theta_time, theta, sig_theta = theta_t(
     data["time"], x_remap, y_remap, sig_x_remap, sig_y_remap
 )
 
+sig_theta_sys = calc_residual_systematic_err(x_remap, y_remap)
+
+sig_theta = np.sqrt((sig_theta) ** 2 + (sig_theta_sys) ** 2)
+
 N_fibre = 5
-N_coil = 81
+N_coil = 84
 S = +1
 V = 0.71e-6
 sign = -1
-sig_N_fibre = 0.5
-sig_N_coil = 0.5
+sig_N_fibre = 0
+sig_N_coil = 0
 sig_V = 0.03e-6
 
 
@@ -267,6 +284,27 @@ fig5, ax5 = current_plot_FP(
     data["time"], current_f, sig_current_f, data["time"], current_p
 )
 
-multipage("output.pdf")
+def find_signal_start(t, x, thresh=50):
+    """Find time of start of signal."""
+    i_max = np.argmax(abs(x) > thresh)
+    return t[i_max]
 
-plt.show()
+def find_signal_end(t, x, thresh=50):
+    """Find time of start of signal."""
+    i_max = np.argmax(abs(x[::-1]) > thresh)
+    return t[-i_max]
+
+t0 = find_signal_start(data['time'], current_f, 50)
+t1 = find_signal_end(data['time'], current_f, 50)
+
+#fig1.tight_layout()
+ax1[0].margins(0, 0.1)
+ax1[1].margins(0, 0.1)
+fig2.tight_layout()
+fig3.tight_layout()
+fig4.tight_layout()
+ax5.set_xlim(t0 - 100, t1+100)
+ax5.margins(0.5, 0.1)
+fig5.tight_layout()
+
+multipage("output.pdf")
