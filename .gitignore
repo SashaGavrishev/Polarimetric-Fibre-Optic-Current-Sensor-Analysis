@@ -161,3 +161,6 @@ cython_debug/
 *.pdf
 multistageanalysis.py
 full_analysis_moving_window.py
+output.pdf
+data/23090805.csv
+output.pdf

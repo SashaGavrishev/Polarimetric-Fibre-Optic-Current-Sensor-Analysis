@@ -47,7 +47,7 @@ mpl.rcParams["figure.dpi"] = 300
 
 # Data File Path
 
-path = "data/large_proportion_of_ellipse_3.csv"
+path = "data\23090805.csv"
 
 ########################################################################################
 # Define Helper Functions
@@ -122,7 +122,6 @@ def filter_data(data, l1, l3, l4, resample=1000):
     _, CH1_V_f = ch1filt.signal()
 
     CH3_V_ellipse, CH4_V_ellipse, _, _ = twod_hist(CH3_V_f, CH4_V_f, resample)
-
 
     data["CH1f"] = CH1_V_f
     data["CH3f"] = CH3_V_f
@@ -264,13 +263,13 @@ sig_theta_sys = calc_residual_systematic_err(x_remap, y_remap)
 
 sig_theta = np.sqrt((sig_theta) ** 2 + (sig_theta_sys) ** 2)
 
-N_fibre = 5
-N_coil = 84
+N_fibre = 10
+N_coil = 100
 S = +1
 V = 0.71e-6
-sign = -1
-sig_N_fibre = 0
-sig_N_coil = 0
+sign = +1
+sig_N_fibre = 0.5
+sig_N_coil = 1
 sig_V = 0.03e-6
 
 
@@ -284,26 +283,29 @@ fig5, ax5 = current_plot_FP(
     data["time"], current_f, sig_current_f, data["time"], current_p
 )
 
+
 def find_signal_start(t, x, thresh=50):
     """Find time of start of signal."""
     i_max = np.argmax(abs(x) > thresh)
     return t[i_max]
+
 
 def find_signal_end(t, x, thresh=50):
     """Find time of start of signal."""
     i_max = np.argmax(abs(x[::-1]) > thresh)
     return t[-i_max]
 
-t0 = find_signal_start(data['time'], current_f, 50)
-t1 = find_signal_end(data['time'], current_f, 50)
 
-#fig1.tight_layout()
+t0 = find_signal_start(data["time"], current_f, 50)
+t1 = find_signal_end(data["time"], current_f, 50)
+
+# fig1.tight_layout()
 ax1[0].margins(0, 0.1)
 ax1[1].margins(0, 0.1)
 fig2.tight_layout()
 fig3.tight_layout()
 fig4.tight_layout()
-ax5.set_xlim(t0 - 100, t1+100)
+ax5.set_xlim(t0 - 100, t1 + 100)
 ax5.margins(0.5, 0.1)
 fig5.tight_layout()
 

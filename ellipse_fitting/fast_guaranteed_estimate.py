@@ -1,5 +1,15 @@
 # -*- coding: utf-8 -*-
-"""Fast Guaranteed Ellipse Estimate"""
+"""Fast Guaranteed Ellipse Estimate
+
+This function implements the ellipse fitting algorithm described in
+Z.Szpak, W. Chojnacki and A. van den Hengel
+"Guaranteed Ellipse Fitting with an Uncertainty Measure for Centre, 
+Axes, and Orientation"
+
+Credit: Zygmunt L. Szpak (c) 2014
+
+Python Implementation: Alexander Gavrishev
+"""
 
 # Import Libraries
 
@@ -23,9 +33,8 @@ def fgee_estimate(x, y, theta_dir, covList=None):
 
     normalizedPoints, T = normalise_isotropically(dPts)
 
-    initialEllipseParameters = (
+    initialEllipseParameters = initialEllipseParameters / np.linalg.norm(
         initialEllipseParameters
-        / np.linalg.norm(initialEllipseParameters)
     )
 
     E = np.diag([1, 2**-1, 1, 2**-1, 2**-1, 1])
@@ -78,9 +87,7 @@ def fgee_estimate(x, y, theta_dir, covList=None):
     para = initialEllipseParametersNormalizedSpace
 
     p = para[1] / (2 * para[0])
-    q = (para[2] / para[0] - (para[1] / (2 * para[0])) ** 2) ** (
-        1 / 2
-    )
+    q = (para[2] / para[0] - (para[1] / (2 * para[0])) ** 2) ** (1 / 2)
     r = para[3] / para[0]
     s = para[4] / para[0]
     t = para[5] / para[0]
@@ -111,11 +118,7 @@ def fgee_estimate(x, y, theta_dir, covList=None):
         rcond=None,
     )[0]
 
-    estimatedParameters = estimatedParameters / np.linalg.norm(
-        estimatedParameters
-    )
-    estimatedParameters = estimatedParameters / np.sign(
-        estimatedParameters[-1]
-    )
+    estimatedParameters = estimatedParameters / np.linalg.norm(estimatedParameters)
+    estimatedParameters = estimatedParameters / np.sign(estimatedParameters[-1])
 
     return estimatedParameters
