@@ -1,5 +1,15 @@
 # -*- coding: utf-8 -*-
-"""Fast Guaranteed Ellipse Fit"""
+"""Fast Guaranteed Ellipse Fit
+
+This function implements the ellipse fitting algorithm described in
+Z.Szpak, W. Chojnacki and A. van den Hengel
+"Guaranteed Ellipse Fitting with an Uncertainty Measure for Centre, 
+Axes, and Orientation"
+
+Credit: Zygmunt L. Szpak (c) 2014
+
+Python Implementation: Alexander Gavrishev
+"""
 
 
 import numpy as np
@@ -110,9 +120,7 @@ def fgee_fit(latentParams, dPts, covList):
             ]
         )
 
-        Pt = np.eye(6) - (
-            (t @ t.conj().T) / (np.linalg.norm(t, 2) ** 2)
-        )
+        Pt = np.eye(6) - ((t @ t.conj().T) / (np.linalg.norm(t, 2) ** 2))
         jacob_latentParameters = (
             (1 / np.linalg.norm(t, 2)) * Pt @ jacob_latentParameters
         )
@@ -165,21 +173,14 @@ def fgee_fit(latentParams, dPts, covList):
             Xbits = B * ((tAt) / (tBt**2))
             X = M - Xbits
 
-            grad = (
-                (
-                    (X @ t)
-                    / np.sqrt((np.abs(tAt / tBt) + np.spacing(1)))
-                )
-                .conj()
-                .T
-            )
+            grad = ((X @ t) / np.sqrt((np.abs(tAt / tBt) + np.spacing(1)))).conj().T
 
             struct["jac_mat"][i, :] = grad @ jacob_latentParameters
 
         struct["H"] = struct["jac_mat"].conj().T @ struct["jac_mat"]
-        struct["cost"][0][struct["k"]] = (
-            struct["r"].conj().T @ struct["r"].conj()
-        )[0][0]
+        struct["cost"][0][struct["k"]] = (struct["r"].conj().T @ struct["r"].conj())[0][
+            0
+        ]
         struct["jacob_latentParameters"] = jacob_latentParameters
 
         struct = levenberg_marquardt_step(struct, 2)
@@ -225,21 +226,18 @@ def fgee_fit(latentParams, dPts, covList):
         +struct["eta"][:, struct["k"]]
 
         if (
-            np.min(
-                [np.linalg.norm(dif_p_eta), np.linalg.norm(dif_m_eta)]
-            )
+            np.min([np.linalg.norm(dif_p_eta), np.linalg.norm(dif_m_eta)])
             < struct["tolEta"]
             and struct["eta_updated"]
         ):
             keep_going = False
         elif (
-            np.abs(struct["cost"][0][struct["k"]])
-            - struct["cost"][0][struct["k"] + 1]
+            np.abs(struct["cost"][0][struct["k"]]) - struct["cost"][0][struct["k"] + 1]
         ) < struct["tolCost"] and struct["eta_updated"]:
             keep_going = False
-        elif (
-            np.linalg.norm(struct["delta"][:, struct["k"] + 1])
-        ) < struct["tolDelta"] and struct["eta_updated"]:
+        elif (np.linalg.norm(struct["delta"][:, struct["k"] + 1])) < struct[
+            "tolDelta"
+        ] and struct["eta_updated"]:
             keep_going = False
         elif np.linalg.norm(grad) < struct["tolGrad"]:
             keep_going = False

@@ -144,7 +144,7 @@ def current_plot_FP(t_f, current_f, t_p, current_p):
     """
     fig, ax = plt.subplots()
     ax.plot(t_p, current_p, "--", label="Pearson", color="black")
-    ax.plot(t_f, current_f, label="Faraday", color="royalblue")
+    ax.plot(t_f, current_f, label="FOCS", color="royalblue")
     ax.set_xlabel(r"Time [$\mu$s]")
     ax.set_ylabel(r"$I (t)$ [A]")
     ax.legend()
@@ -167,13 +167,14 @@ def current_plot_FP(t_f, current_f, sig_current_f, t_p, current_p):
     """
     fig, ax = plt.subplots()
     ax.plot(t_p, current_p, "--", label="Pearson", color="black")
-    ax.plot(t_f, current_f, label="Faraday", color="royalblue")
+    ax.plot(t_f, current_f, label="FOCS", color="royalblue")
     ax.fill_between(
         t_f,
         current_f - sig_current_f,
         current_f + sig_current_f,
         color="royalblue",
         alpha=0.5,
+        label=r"$\pm 1 \sigma{}$",
     )
     ax.set_xlabel(r"Time [$\mu$s]")
     ax.set_ylabel(r"$I (t)$ [A]")

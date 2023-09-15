@@ -1,5 +1,15 @@
 # -*- coding: utf-8 -*-
-"""Fast Levenberg Marquardt Step"""
+"""Fast Levenberg Marquardt Step
+
+This function implements the ellipse fitting algorithm described in
+Z.Szpak, W. Chojnacki and A. van den Hengel
+"Guaranteed Ellipse Fitting with an Uncertainty Measure for Centre, 
+Axes, and Orientation"
+
+Credit: Zygmunt L. Szpak (c) 2014
+
+Python Implementation: Alexander Gavrishev
+"""
 
 import numpy as np
 
@@ -52,8 +62,7 @@ def levenberg_marquardt_step(struct, rho):
             [
                 1,
                 2 * eta_potential_a[0],
-                eta_potential_a[0] ** 2
-                + np.abs(eta_potential_a[1]) ** rho,
+                eta_potential_a[0] ** 2 + np.abs(eta_potential_a[1]) ** rho,
                 eta_potential_a[2],
                 eta_potential_a[3],
                 eta_potential_a[4],
@@ -70,8 +79,7 @@ def levenberg_marquardt_step(struct, rho):
             [
                 1,
                 2 * eta_potential_b[0],
-                eta_potential_b[0] ** 2
-                + np.abs(eta_potential_b[1]) ** rho,
+                eta_potential_b[0] ** 2 + np.abs(eta_potential_b[1]) ** rho,
                 eta_potential_b[2],
                 eta_potential_b[3],
                 eta_potential_b[4],
@@ -90,13 +98,7 @@ def levenberg_marquardt_step(struct, rho):
     for i in range(0, numberOfPoints):
         m = data_points[:, i]
 
-        ux_i = (
-            np.array(
-                [[m[0] ** 2, m[0] * m[1], m[1] ** 2, m[0], m[1], 1]]
-            )
-            .conj()
-            .T
-        )
+        ux_i = np.array([[m[0] ** 2, m[0] * m[1], m[1] ** 2, m[0], m[1], 1]]).conj().T
 
         dux_i = (
             np.array(

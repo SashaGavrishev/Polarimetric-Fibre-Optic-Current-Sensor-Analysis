@@ -1,5 +1,15 @@
 # -*- coding: utf-8 -*-
-"""Self-Normalizing Algebraic Method"""
+"""Self-Normalizing Algebraic Method
+
+This function implements the ellipse fitting algorithm described in
+Z.Szpak, W. Chojnacki and A. van den Hengel
+"Guaranteed Ellipse Fitting with an Uncertainty Measure for Centre, 
+Axes, and Orientation"
+
+Credit: Zygmunt L. Szpak (c) 2014
+
+Python Implementation: Alexander Gavrishev
+"""
 
 import numpy as np
 
@@ -28,8 +38,8 @@ def self_norm_alg_fit(x, y, debias=True):
     evals, evects = np.linalg.eigh(np.inner(np.dot(L, Sr), L))
     j = np.argmin(evals)
     G1 = np.dot(evects[:, j], L)
-    G2 = -np.dot(G1, S12)/S22
+    G2 = -np.dot(G1, S12) / S22
     if debias:
-        G2+= (G1[0] + G1[2]) * evals[j]
-    
-    return np.r_[G1,G2]
+        G2 += (G1[0] + G1[2]) * evals[j]
+
+    return np.r_[G1, G2]

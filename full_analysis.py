@@ -5,6 +5,7 @@
 # Import Packages
 ########################################################################################
 
+
 from helper_function.plotting_tools import (
     algebraic_plot_ellipse,
     lissajous_plot,
@@ -47,7 +48,7 @@ mpl.rcParams["figure.dpi"] = 300
 
 # Data File Path
 
-path = "data\23090805.csv"
+path = r"data\large_proportion_of_ellipse.csv"
 
 ########################################################################################
 # Define Helper Functions
@@ -97,7 +98,7 @@ def import_data(path):
     return data
 
 
-def filter_data(data, l1, l3, l4, resample=1000):
+def filter_data(data, l1, l3, l4, resample=100):
     time = data["time"]
     CH3_V = data["CH3"]
     CH4_V = data["CH4"]
@@ -122,6 +123,7 @@ def filter_data(data, l1, l3, l4, resample=1000):
     _, CH1_V_f = ch1filt.signal()
 
     CH3_V_ellipse, CH4_V_ellipse, _, _ = twod_hist(CH3_V_f, CH4_V_f, resample)
+    # CH3_V_ellipse, CH4_V_ellipse = CH3_V_f, CH4_V_f
 
     data["CH1f"] = CH1_V_f
     data["CH3f"] = CH3_V_f
@@ -161,7 +163,7 @@ def multipage(filename, figs=None, dpi=100):
 
 data = import_data(path)
 
-data = filter_data(data, 8, 8, 8, 1000)
+data = filter_data(data, 8, 8, 8, 5000)
 
 # Raw and Filtered Signals
 
@@ -178,6 +180,7 @@ line2_1.set_label("filtered data")
 ax2.set_title("")
 ax2.legend()
 
+
 # Fit
 
 tdir = time()
@@ -193,6 +196,8 @@ elapsed_time_fgee = time() - tfgee
 fig3, ax3, line3_1 = lissajous_plot(data["CH3e"], data["CH4e"])
 
 ax3.set_title("")
+ax3.set_xlabel(r"$V_{PD1}(t)$ [mV]")
+ax3.set_ylabel(r"$V_{PD2}(t)$ [mV]")
 
 line3_2 = algebraic_plot_ellipse(theta_dir, ax3)
 line3_4 = algebraic_plot_ellipse(theta_fgee, ax3)
@@ -201,14 +206,16 @@ line3_1.set_marker("x")
 line3_1.set_linestyle("")
 line3_1.set_label("filtered data")
 
-line3_2.set_label("direct fit")
+line3_2.set_label("DIRECT fit")
 line3_2.set_color("royalblue")
 
 
-line3_4.set_label("fgee fit")
+line3_4.set_label("FGEE fit")
 line3_4.set_color("darkred")
 
 ax3.legend()
+
+plt.savefig("fitcomparison.png", dpi=300)
 
 print("-----------------------------------------------")
 print(f"DIR Method Total Time: {elapsed_time_dir} seconds")
@@ -249,11 +256,14 @@ sig_x_remap, sig_y_remap = std_dPts
 
 fig4, ax4, line4_1 = lissajous_plot(x_remap, y_remap)
 
-ax4.set_title("Lissajous Figure - Remapped")
+ax4.set_title("")
 plot_circle(ax4)
 ax4.set_xlim(-2, 2)
 ax4.set_ylim(-2, 2)
 ax4.legend()
+ax4.set_xlabel(r"Remap$(V_{PD1}(t))$ [mV]")
+ax4.set_ylabel(r"Remap$(V_{PD2}(t))$ [mV]")
+plt.savefig("remapped.png", dpi=300)
 
 theta_time, theta, sig_theta = theta_t(
     data["time"], x_remap, y_remap, sig_x_remap, sig_y_remap
@@ -267,9 +277,9 @@ N_fibre = 10
 N_coil = 100
 S = +1
 V = 0.71e-6
-sign = +1
+sign = -1
 sig_N_fibre = 0.5
-sig_N_coil = 1
+sig_N_coil = 0.5
 sig_V = 0.03e-6
 
 
@@ -309,4 +319,8 @@ ax5.set_xlim(t0 - 100, t1 + 100)
 ax5.margins(0.5, 0.1)
 fig5.tight_layout()
 
+plt.savefig("current.png", dpi=300)
+
 multipage("output.pdf")
+
+plt.show()

@@ -1,5 +1,15 @@
 # -*- coding: utf-8 -*-
-"""Normalising Data Isotropically"""
+"""Normalising Data Isotropically
+
+This function implements the ellipse fitting algorithm described in
+Z.Szpak, W. Chojnacki and A. van den Hengel
+"Guaranteed Ellipse Fitting with an Uncertainty Measure for Centre, 
+Axes, and Orientation"
+
+Credit: Zygmunt L. Szpak (c) 2014
+
+Python Implementation: Alexander Gavrishev
+"""
 
 
 import numpy as np

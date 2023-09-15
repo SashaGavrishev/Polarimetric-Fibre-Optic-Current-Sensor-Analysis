@@ -1,5 +1,15 @@
 # -*- coding: utf-8 -*-
-"""Compute Covariance of Sampson Estimate"""
+"""Compute Covariance of Sampson Estimate
+
+This function implements the ellipse fitting algorithm described in
+Z.Szpak, W. Chojnacki and A. van den Hengel
+"Guaranteed Ellipse Fitting with an Uncertainty Measure for Centre, 
+Axes, and Orientation"
+
+Credit: Zygmunt L. Szpak (c) 2014
+
+Python Implementation: Alexander Gavrishev
+"""
 
 # Import Libraries
 
@@ -20,13 +30,7 @@ def estimate_noise_lvl(algebraicEllipseParameters, dPts, covList):
     for i in range(0, nPts):
         m = dPts[i, :]
 
-        ux_i = (
-            np.array(
-                [[m[0] ** 2, m[0] * m[1], m[1] ** 2, m[0], m[1], 1]]
-            )
-            .conj()
-            .T
-        )
+        ux_i = np.array([[m[0] ** 2, m[0] * m[1], m[1] ** 2, m[0], m[1], 1]]).conj().T
 
         dux_i = (
             np.array(
@@ -56,25 +60,20 @@ def estimate_noise_lvl(algebraicEllipseParameters, dPts, covList):
     return sigma_squared
 
 
-def cov_sampson_estimate(
-    algebraicEllipseParameters, dPts, covList=None
-):
+def cov_sampson_estimate(algebraicEllipseParameters, dPts, covList=None):
     nPts = max(dPts.shape)
 
     if covList is None:
         covList = np.tile(np.eye(2), (1, nPts)).T.reshape(nPts, 2, 2)
-        sigma_squared = estimate_noise_lvl(
-            algebraicEllipseParameters, dPts, covList
-        )
+        sigma_squared = estimate_noise_lvl(algebraicEllipseParameters, dPts, covList)
 
         for i in range(0, nPts):
             covList[i] = covList[i] * sigma_squared
 
     dPts, T = normalise_isotropically(dPts)
 
-    algebraicEllipseParameters = (
+    algebraicEllipseParameters = algebraicEllipseParameters / np.linalg.norm(
         algebraicEllipseParameters
-        / np.linalg.norm(algebraicEllipseParameters)
     )
 
     E = np.diag([1, 2**-1, 1, 2**-1, 2**-1, 1])
@@ -132,13 +131,7 @@ def cov_sampson_estimate(
     for i in range(0, nPts):
         m = dPts[i, :]
 
-        ux_i = (
-            np.array(
-                [[m[0] ** 2, m[0] * m[1], m[1] ** 2, m[0], m[1], 1]]
-            )
-            .conj()
-            .T
-        )
+        ux_i = np.array([[m[0] ** 2, m[0] * m[1], m[1] ** 2, m[0], m[1], 1]]).conj().T
 
         dux_i = (
             np.array(
@@ -182,14 +175,7 @@ def cov_sampson_estimate(
 
     F = np.linalg.lstsq(
         E,
-        (
-            P34
-            @ np.linalg.pinv(D3)
-            @ np.kron(T, T).conj().T
-            @ D3
-            @ P34
-            @ E
-        ),
+        (P34 @ np.linalg.pinv(D3) @ np.kron(T, T).conj().T @ D3 @ P34 @ E),
         rcond=None,
     )[0]
 
